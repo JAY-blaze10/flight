@@ -1,0 +1,9 @@
+sudo dmesg -c && sudo rm -rf /var/log/kern* && sudo rm -rf /var/log/syslog* && sudo rm -rf /var/log/journal/ && sudo rm -rf /run/log/journal/              		  (deleate the pendrive history)
+
+
+sudo journalctl | grep -i usb  									(cheack the pendrive history)
+dmesg | grep usb
+
+
+
+history -c                        								(deleate the cmd history)
