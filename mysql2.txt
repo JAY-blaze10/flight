@@ -1,0 +1,237 @@
+//Create a database
+Type:
+CREATE DATABASE company_db;
+
+USE company_db;
+
+//1. Create employees table
+
+CREATE TABLE employees (
+    emp_name VARCHAR(50),
+    street VARCHAR(50),
+    city VARCHAR(50)
+);
+
+//2. Create works table
+
+CREATE TABLE works (
+    emp_name VARCHAR(50),
+    firm_name VARCHAR(50),
+    salary INT
+);
+
+
+//3. Create firm table
+
+CREATE TABLE firm (
+    firm_name VARCHAR(50),
+    city VARCHAR(50)
+);
+
+
+//4. Create supervises table
+
+CREATE TABLE supervises (
+    emp_name VARCHAR(50),
+    supervisor_name VARCHAR(50)
+);
+
+
+SHOW TABLES;
+
+Step 4: Insert records into tables
+
+//1. Insert into employees
+
+INSERT INTO employees VALUES
+('Aarav Joshi','FC Road','Pune'),
+('Diya Kulkarni','Camp Road','Pune'),
+('Kabir Menon','MG Road','Kochi'),
+('Isha Reddy','Banjara Hills','Hyderabad'),
+('Neil Fernandes','FC Road','Pune'),
+('Tara Bose','Park Street','Kolkata'),
+('Yash Malhotra','Sector 17','Chandigarh'),
+('Pooja Desai','FC Road','Pune'),
+('Rehan Khan','Marine Drive','Mumbai'),
+('Nisha Pillai','MG Road','Kochi');
+
+
+//2. Insert into works
+
+INSERT INTO works VALUES
+('Aarav Joshi','Wipro',55000),
+('Diya Kulkarni','Wipro',65000),
+('Kabir Menon','Wipro',14000),
+('Isha Reddy','Cognizant',22000),
+('Neil Fernandes','Cognizant',16000),
+('Tara Bose','Cognizant',9000),
+('Yash Malhotra','Flipkart',42000),
+('Pooja Desai','Flipkart',48000),
+('Rehan Khan','Adobe',75000),
+('Nisha Pillai','Oracle',32000);
+
+
+//3. Insert into firm
+
+INSERT INTO firm VALUES
+('Wipro','Pune'),
+('Wipro','Kochi'),
+('Cognizant','Pune'),
+('Cognizant','Kochi'),
+('Cognizant','Hyderabad'),
+('Flipkart','Chandigarh'),
+('Adobe','Mumbai'),
+('Oracle','Kochi'),
+('Oracle','Pune'),
+('Oracle','Hyderabad');
+
+
+//4. Insert into supervises
+
+INSERT INTO supervises VALUES
+('Aarav Joshi','Neil Fernandes'),
+('Diya Kulkarni','Tara Bose'),
+('Neil Fernandes','Kabir Menon'),
+('Isha Reddy','Yash Malhotra'),
+('Kabir Menon','Nisha Pillai'),
+('Tara Bose','Diya Kulkarni'),
+('Yash Malhotra','Pooja Desai'),
+('Pooja Desai','Aarav Joshi'),
+('Rehan Khan','Nisha Pillai'),
+('Nisha Pillai','Rehan Khan');
+
+//Step 5: Check whether data is inserted correctly
+
+SELECT * FROM employees;
+
+
+SELECT * FROM works;
+
+
+//1.Find names of all employees who work for Wipro.
+
+SELECT emp_name
+FROM works
+WHERE firm_name = 'Wipro';
+
+
+//2Find names and cities of employees who work for Wipro.
+
+SELECT e.emp_name, e.city
+FROM employees e
+INNER JOIN works w
+ON e.emp_name = w.emp_name
+WHERE w.firm_name = 'Wipro';
+
+//3Find names, streets and cities of Wipro employees earning more than 12000.
+
+SELECT e.emp_name, e.street, e.city
+FROM employees e
+INNER JOIN works w
+ON e.emp_name = w.emp_name
+WHERE w.firm_name = 'Wipro'
+AND w.salary > 12000;
+
+//4Find employees who live in the same city as their firm.
+
+SELECT e.emp_name
+FROM employees e
+INNER JOIN works w
+ON e.emp_name = w.emp_name
+INNER JOIN firm f
+ON w.firm_name = f.firm_name
+WHERE e.city = f.city;
+
+//5Find employees who live in the same city and street as their supervisors.
+
+SELECT e.emp_name
+FROM employees e
+INNER JOIN supervises s
+ON e.emp_name = s.emp_name
+INNER JOIN employees sup
+ON s.supervisor_name = sup.emp_name
+WHERE e.city = sup.city
+AND e.street = sup.street;
+
+//6Find all employees who do not work for Wipro.
+
+SELECT emp_name
+FROM works
+WHERE firm_name <> 'Wipro';
+
+
+//7SELECT emp_name, salary
+
+FROM works
+WHERE salary > (
+    SELECT MAX(salary)
+    FROM works
+    WHERE firm_name = 'Cognizant'
+);
+
+//8Find firms located in every city where Cognizant is located.
+
+SELECT firm_name
+FROM firm
+WHERE city IN (
+    SELECT city
+    FROM firm
+    WHERE firm_name = 'Cognizant'
+)
+GROUP BY firm_name
+HAVING COUNT(DISTINCT city) = (
+    SELECT COUNT(DISTINCT city)
+    FROM firm
+    WHERE firm_name = 'Cognizant'
+);
+
+//9Find employees who earn more than the average salary of their firm.
+
+SELECT emp_name, firm_name, salary
+FROM works w
+WHERE salary > (
+    SELECT AVG(salary)
+    FROM works
+    WHERE firm_name = w.firm_name
+);
+
+//10 Find the firm having the largest number of employees.
+
+SELECT firm_name, COUNT(*) AS total_employees
+FROM works
+GROUP BY firm_name
+HAVING COUNT(*) = (
+    SELECT MAX(emp_count)
+    FROM (
+        SELECT COUNT(*) AS emp_count
+        FROM works
+        GROUP BY firm_name
+    ) AS temp
+);
+
+//11 Find the firm having the smallest total payroll.
+
+SELECT firm_name, SUM(salary) AS total_payroll
+FROM works
+GROUP BY firm_name
+HAVING SUM(salary) = (
+    SELECT MIN(total_salary)
+    FROM (
+        SELECT SUM(salary) AS total_salary
+        FROM works
+        GROUP BY firm_name
+    ) AS temp
+);
+
+//12Find firms whose average salary is higher than Wipro's average salary.
+
+SELECT firm_name, AVG(salary) AS average_salary
+FROM works
+GROUP BY firm_name
+HAVING AVG(salary) > (
+    SELECT AVG(salary)
+    FROM works
+    WHERE firm_name = 'Wipro'
+);
+
+exit;

@@ -1,0 +1,106 @@
+CREATE DATABASE CollegeDB;
+USE CollegeDB;
+
+//Create tables
+ //1. Create Pupil table
+
+CREATE TABLE Pupil (
+    pupilid INT PRIMARY KEY,
+    pupilname VARCHAR(50),
+    guideid INT,
+    pupilcity VARCHAR(50)
+);
+
+//2. Create Guide table
+
+CREATE TABLE Guide (
+    guideid INT PRIMARY KEY,
+    guidename VARCHAR(50),
+    guidecity VARCHAR(50),
+    specialization VARCHAR(50)
+);
+
+//1. Insert records into Pupil
+
+INSERT INTO Pupil VALUES
+(11,'Isha',401,'Pune'),
+(12,'Rohit',402,'Nashik'),
+(13,'Madhuri',401,'Satara'),
+(14,'Tejas',403,'Mumbai'),
+(15,'Gauri',404,'Kolhapur'),
+(16,'Ajay',405,'Pune'),
+(17,'Sneha',NULL,'Nashik'),
+(18,'Harsh',406,'Nagpur'),
+(19,'Dipti',407,'Solapur'),
+(20,'Nikhil',404,'Kolhapur');
+
+//2. Insert records into Guide
+
+INSERT INTO Guide VALUES
+(401,'Dr. Bapat','Pune','Mathematics'),
+(402,'Dr. Gokhale','Nashik','Physics'),
+(403,'Dr. Naik','Mumbai','Chemistry'),
+(404,'Dr. Sawant','Kolhapur','Computer'),
+(405,'Dr. Kale','Pune','Computer'),
+(406,'Dr. More','Nagpur','English'),
+(407,'Dr. Thakur','Solapur','Biology'),
+(408,'Dr. Phadke','Satara','History');
+
+SELECT * FROM Pupil;
+SELECT * FROM Guide;
+
+//1. Find the guide of each pupil.
+Use LEFT JOIN.
+
+SELECT p.pupilid, p.pupilname, g.guidename,
+       g.specialization
+FROM Pupil p
+LEFT JOIN Guide g
+ON p.guideid = g.guideid;
+
+//2. Find pupils who do not have any guide.
+Use LEFT JOIN + IS NULL.
+
+SELECT p.pupilid, p.pupilname
+FROM Pupil p
+LEFT JOIN Guide g
+ON p.guideid = g.guideid
+WHERE g.guideid IS NULL;
+
+
+//Q3. Find pupils who do not have any guide as well as guides who do not have any pupil.
+Use FULL OUTER JOIN.
+
+SELECT p.pupilid, p.pupilname, g.guideid, g.guidename
+FROM Pupil p
+LEFT JOIN Guide g
+ON p.guideid = g.guideid
+WHERE g.guideid IS NULL
+
+UNION
+
+SELECT p.pupilid, p.pupilname, g.guideid, g.guidename
+FROM Pupil p
+RIGHT JOIN Guide g
+ON p.guideid = g.guideid
+WHERE p.pupilid IS NULL;
+
+//Q4. Find pupils whose guide's specialization is Computer.
+
+SELECT p.pupilid, p.pupilname, g.guidename,
+       g.specialization
+FROM Pupil p
+INNER JOIN Guide g
+ON p.guideid = g.guideid
+WHERE g.specialization = 'Computer';
+
+//Q5. Create a view containing the total number of pupils whose guide belongs to Pune.
+
+CREATE VIEW Pune_Guide_Count AS
+SELECT COUNT(p.pupilid) AS Total_Pupils
+FROM Pupil p
+INNER JOIN Guide g
+ON p.guideid = g.guideid
+WHERE g.guidecity = 'Pune';
+
+SELECT * FROM Pune_Guide_Count;

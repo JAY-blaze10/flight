@@ -1,0 +1,102 @@
+CREATE DATABASE library_db;
+\c library_db
+
+
+CREATE TABLE Granth (
+    Granth_No INT PRIMARY KEY,
+    Title VARCHAR(100),
+    Author VARCHAR(100),
+    Publisher VARCHAR(100),
+    Count INT
+);
+
+INSERT INTO Granth VALUES
+(211, 'Computer Graphics', 'Donald Hearn', 'Pearson', 6),
+(212, 'Discrete Mathematics', 'Kenneth Rosen', 'McGraw Hill', 9),
+(213, 'Computer Organization', 'Carl Hamacher', 'McGraw Hill', 5),
+(214, 'Compiler Design', 'Alfred Aho', 'Pearson', 4),
+(215, 'Machine Learning', 'Tom Mitchell', 'McGraw Hill', 7);
+
+SELECT * FROM Granth;
+
+CREATE TABLE Lib_Audit (
+    Granth_No INT,
+    Title VARCHAR(100),
+    Author VARCHAR(100),
+    Publisher VARCHAR(100),
+    Count INT,
+    Date DATE,
+    Status VARCHAR(20)
+);
+
+\d Lib_Audit
+
+CREATE OR REPLACE FUNCTION audit_delete()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO Lib_Audit
+    VALUES (
+        OLD.Granth_No,
+        OLD.Title,
+        OLD.Author,
+        OLD.Publisher,
+        OLD.Count,
+        CURRENT_DATE,
+        'deleted'
+    );
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER before_delete_granth
+BEFORE DELETE ON Granth
+FOR EACH ROW
+EXECUTE FUNCTION audit_delete();
+
+//Create AFTER UPDATE trigger
+
+CREATE OR REPLACE FUNCTION audit_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO Lib_Audit
+    VALUES (
+        NEW.Granth_No,
+        NEW.Title,
+        NEW.Author,
+        NEW.Publisher,
+        NEW.Count,
+        CURRENT_DATE,
+        'updated'
+    );
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+//Now create the trigger:
+
+CREATE TRIGGER after_update_granth
+AFTER UPDATE ON Granth
+FOR EACH ROW
+EXECUTE FUNCTION audit_update();
+
+//Test UPDATE trigger
+//Update one book's count:
+
+UPDATE Granth
+SET Count = 10
+WHERE Granth_No = 212;
+
+SELECT * FROM Granth;
+SELECT * FROM Lib_Audit;
+
+//Test DELETE trigger
+
+DELETE FROM Granth
+WHERE Granth_No = 213;
+
+SELECT * FROM Granth;
+SELECT * FROM Lib_Audit;
