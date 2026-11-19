@@ -1,0 +1,92 @@
+use ArticleDB
+
+db.createCollection("tech_articles")
+
+db.tech_articles.insertMany([
+{
+    ArticleTitle: "MongoDB Basics",
+    ArticleSummary: "Introduction to MongoDB",
+    Writer: "Isha",
+    ArticleURL: "http://example.com/mongo1",
+    Topics: ["Database", "MongoDB"],
+    LikesCount: 150
+},
+{
+    ArticleTitle: "Advanced MongoDB",
+    ArticleSummary: "Aggregation and indexing",
+    Writer: "Rohan",
+    ArticleURL: "http://example.com/mongo2",
+    Topics: ["Database", "MongoDB"],
+    LikesCount: 90
+},
+{
+    ArticleTitle: "Docker Fundamentals",
+    ArticleSummary: "Basics of containers",
+    Writer: "Nikhil",
+    ArticleURL: "http://example.com/docker1",
+    Topics: ["DevOps", "Docker"],
+    LikesCount: 60
+},
+{
+    ArticleTitle: "REST API Design",
+    ArticleSummary: "Designing web APIs",
+    Writer: "Isha",
+    ArticleURL: "http://example.com/rest",
+    Topics: ["Web", "API"],
+    LikesCount: 40
+},
+{
+    ArticleTitle: "Intro to Cybersecurity",
+    ArticleSummary: "Getting started with security",
+    Writer: "Isha",
+    ArticleURL: "http://example.com/cyber",
+    Topics: ["Security"],
+    LikesCount: 210
+}
+])
+
+Find the number of articles written by Isha
+db.tech_articles.countDocuments({
+    Writer: "Isha"
+})
+
+Find the articles having minimum likes and maximum likes among those written by Isha
+db.tech_articles.aggregate([
+    {$match: {Writer: "Isha"}},
+    {
+        $group: {
+            _id: null,
+            MinLikes: {$min: "$LikesCount"},
+            MaxLikes: {$max: "$LikesCount"}
+        }
+    }
+])
+
+Find the average number of likes of articles written by Isha
+db.tech_articles.aggregate([
+    {$match: {Writer: "Isha"}},
+    {
+        $group: {
+            _id: null,
+            AverageLikes: {$avg: "$LikesCount"}
+        }
+    }
+])
+
+Find the first and last article written by Isha
+db.tech_articles.aggregate([
+    {$match: {Writer: "Isha"}},
+    {$sort: {_id: 1}},
+    {
+        $group: {
+            _id: "$Writer",
+            FirstArticle: {$first: "$ArticleTitle"},
+            LastArticle: {$last: "$ArticleTitle"}
+        }
+    }
+])
+
+Create an index on Writer
+db.tech_articles.createIndex({
+    Writer: 1
+})
