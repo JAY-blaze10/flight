@@ -1,0 +1,108 @@
+use LibraryDB
+
+db.createCollection("digital_library")
+db.digital_library.insertMany([
+{
+    TITLE: "Node Basics",
+    DESCRIPTION: "Introduction to Node.js",
+    AUTHOR: "Kabir",
+    LINK: "http://example.com/node1",
+    CATEGORIES: ["Programming", "Node"],
+    LIKES: 110
+},
+{
+    TITLE: "Advanced Node",
+    DESCRIPTION: "Deep dive into Node.js",
+    AUTHOR: "Tara",
+    LINK: "http://example.com/node2",
+    CATEGORIES: ["Programming", "Node"],
+    LIKES: 70
+},
+{
+    TITLE: "C++ Fundamentals",
+    DESCRIPTION: "Basics of C++",
+    AUTHOR: "Neil",
+    LINK: "http://example.com/cpp1",
+    CATEGORIES: ["Programming", "C++"],
+    LIKES: 45
+},
+{
+    TITLE: "Responsive Web Design",
+    DESCRIPTION: "HTML, CSS, Flexbox",
+    AUTHOR: "Kabir",
+    LINK: "http://example.com/rwd",
+    CATEGORIES: ["Web", "CSS"],
+    LIKES: 25
+},
+{
+    TITLE: "Big Data Intro",
+    DESCRIPTION: "Getting started with Big Data",
+    AUTHOR: "Tara",
+    LINK: "http://example.com/bigdata",
+    CATEGORIES: ["Big Data"],
+    LIKES: 180
+}
+])
+
+db.digital_library.insertOne({
+    TITLE: "Neural Networks",
+    DESCRIPTION: "Neural network concepts",
+    AUTHOR: "Neil",
+    LINK: "http://example.com/nn",
+    CATEGORIES: ["AI", "DeepLearning"],
+    LIKES: 140,
+    USERNAME: "reader21",
+    REVIEWS: ["Well explained", "Very helpful"]
+})
+
+Display all documents whose TITLE is Node Basics
+db.digital_library.find({TITLE: "Node Basics"})
+
+Display documents written by Kabir OR whose TITLE is Node Basics
+db.digital_library.find({
+    $or: [
+        {AUTHOR: "Kabir"},
+        {TITLE: "Node Basics"}
+    ]
+})
+
+Display documents whose TITLE is Node Basics AND AUTHOR is Kabir
+db.digital_library.find({
+    TITLE: "Node Basics",
+    AUTHOR: "Kabir"
+})
+
+Display documents whose LIKES are greater than 20
+db.digital_library.find({
+    LIKES: {$gt: 20}
+})
+
+Display documents whose LIKES are greater than 100 AND whose TITLE is Node Basics OR AUTHOR is Kabir
+db.digital_library.find({
+    LIKES: {$gt: 100},
+    $or: [
+        {TITLE: "Node Basics"},
+        {AUTHOR: "Kabir"}
+    ]
+})
+
+Update the TITLE of Node Basics
+db.digital_library.updateOne(
+    {TITLE: "Node Basics"},
+    {$set: {TITLE: "Node Basics Overview"}}
+)
+
+Delete the document whose TITLE is Big Data Intro
+db.digital_library.deleteOne({
+    TITLE: "Big Data Intro"
+})
+
+Display exactly two documents written by Kabir
+db.digital_library.find({
+    AUTHOR: "Kabir"
+}).limit(2)
+
+Display the second document published by Kabir
+db.digital_library.find({
+    AUTHOR: "Kabir"
+}).skip(1).limit(1)
