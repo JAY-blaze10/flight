@@ -1,0 +1,111 @@
+use LibraryDB
+
+db.createCollection("e_library")
+
+db.e_library.insertMany([
+{
+    TITLE: "Angular Essentials",
+    DESCRIPTION: "Learn Angular basics",
+    AUTHOR: "Isha",
+    LINK: "http://example.com/ng1",
+    CATEGORIES: ["Programming", "Angular"],
+    LIKES: 85
+},
+{
+    TITLE: "Express Guide",
+    DESCRIPTION: "Backend with Express",
+    AUTHOR: "Rohan",
+    LINK: "http://example.com/express",
+    CATEGORIES: ["Programming", "Express"],
+    LIKES: 45
+},
+{
+    TITLE: "VueJS Intro",
+    DESCRIPTION: "Progressive frontend framework",
+    AUTHOR: "Nikhil",
+    LINK: "http://example.com/vue",
+    CATEGORIES: ["Web", "VueJS"],
+    LIKES: 115
+},
+{
+    TITLE: "R for Data Analysis",
+    DESCRIPTION: "Data analysis using R",
+    AUTHOR: "Isha",
+    LINK: "http://example.com/rdata",
+    CATEGORIES: ["R", "Data"],
+    LIKES: 65
+},
+{
+    TITLE: "IoT Basics",
+    DESCRIPTION: "Introduction to IoT",
+    AUTHOR: "Rohan",
+    LINK: "http://example.com/iot",
+    CATEGORIES: ["IoT", "Embedded"],
+    LIKES: 55
+}
+])
+
+db.e_library.insertOne({
+    TITLE: "Cloud Computing",
+    DESCRIPTION: "Cloud concepts",
+    AUTHOR: "Nikhil",
+    LINK: "http://example.com/cloud",
+    CATEGORIES: ["Cloud", "DevOps"],
+    LIKES: 125,
+    USERNAME: "user789",
+    REVIEWS: ["Clear explanations", "Great reference"]
+})
+
+Display documents whose TITLE is VueJS Intro
+db.e_library.find({
+    TITLE: "VueJS Intro"
+})
+
+Display documents written by Isha OR whose TITLE is VueJS Intro
+db.e_library.find({
+    $or: [
+        {AUTHOR: "Isha"},
+        {TITLE: "VueJS Intro"}
+    ]
+})
+
+Display documents whose TITLE is VueJS Intro AND AUTHOR is Isha
+db.e_library.find({
+    TITLE: "VueJS Intro",
+    AUTHOR: "Isha"
+})
+
+Display documents whose LIKES are greater than 90
+db.e_library.find({
+    LIKES: {$gt: 90}
+})
+
+Display documents whose LIKES are greater than 90 AND whose TITLE is VueJS Intro OR AUTHOR is Nikhil
+db.e_library.find({
+    LIKES: {$gt: 90},
+    $or: [
+        {TITLE: "VueJS Intro"},
+        {AUTHOR: "Nikhil"}
+    ]
+})
+
+Update the TITLE of VueJS Intro
+db.e_library.updateOne(
+    {TITLE: "VueJS Intro"},
+    {$set: {TITLE: "VueJS Overview"}}
+)
+
+Delete the document whose TITLE is IoT Basics
+db.e_library.deleteOne({
+    TITLE: "IoT Basics"
+})
+
+Display exactly two documents written by Isha
+db.e_library.find({
+    AUTHOR: "Isha"
+}).limit(2)
+
+Display the second document published by Isha
+db.e_library.find({
+    AUTHOR: "Isha"
+}).skip(1).limit(1)
